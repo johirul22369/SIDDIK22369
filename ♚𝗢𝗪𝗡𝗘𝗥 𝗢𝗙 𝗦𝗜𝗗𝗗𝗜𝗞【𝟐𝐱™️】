@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hignice Official Hack - Siddik Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;900&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Rubik', sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #05070f;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* মূল গেম ওয়েবসাইট / রেফারেল লিংক iframe */
+        #game-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 1;
+        }
+
+        /* ওপরের ডান সাইডে ছোট ফ্লোটিং আইকন */
+        #floating-icon-btn {
+            position: fixed;
+            top: 40px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #ef4444;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+            cursor: move;
+            z-index: 9999;
+            overflow: hidden;
+            touch-action: none;
+            background: #b91c1c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #floating-icon-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+
+        /* গোল বড় পপআপ উইন্ডো */
+        .overlay-box {
+            position: fixed;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 260px;
+            height: 260px;
+            background: rgba(10, 4, 4, 0.88);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            box-shadow: 0 0 35px rgba(239, 68, 68, 0.7), inset 0 0 15px rgba(239, 68, 68, 0.4);
+            padding: 16px;
+            display: none;
+            z-index: 9999;
+            border: 3px solid #ef4444;
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .card-bg-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .card-content-inner {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .market-icon-small {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ef4444;
+            margin-bottom: 2px;
+            cursor: grab;
+        }
+
+        .owner-title {
+            font-size: 8px;
+            color: #facc15;
+            font-weight: 900;
+            margin-bottom: 1px;
+            cursor: grab;
+        }
+
+        .watermark-text {
+            font-size: 6px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+            font-weight: 700;
+        }
+
+        .market-selector {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 3px;
+        }
+
+        .market-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #94a3b8;
+            font-size: 7.5px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .market-btn.active {
+            background: #ef4444;
+            color: #fff;
+            border-color: #f87171;
+        }
+
+        /* ভিআইপি পাসওয়ার্ড সেকশন */
+        #auth-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+            margin-top: 2px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 3px 6px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #ef4444;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 8.5px;
+            text-align: center;
+            margin-bottom: 2px;
+            outline: none;
+            font-weight: 600;
+        }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 7px;
+            color: #cbd5e1;
+            margin-bottom: 3px;
+            cursor: pointer;
+        }
+
+        .remember-row input {
+            cursor: pointer;
+            width: 10px;
+            height: 10px;
+        }
+
+        .auth-btn {
+            padding: 2px 8px;
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 8px;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        #error-msg {
+            color: #ff3366;
+            font-size: 6.5px;
+            margin-top: 1px;
+            display: none;
+            font-weight: 700;
+        }
+
+        /* হ্যাক সাকসেস সেকশন */
+        #hack-active-section {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .period-number {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #38bdf8;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px dashed rgba(56, 189, 248, 0.5);
+            margin-bottom: 1px;
+        }
+
+        .timer-display {
+            font-size: 8px;
+            color: #facc15;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .signal-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            border-radius: 6px;
+            padding: 2px 6px;
+            margin-bottom: 2px;
+        }
+
+        #res-size {
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .number-balls {
+            display: flex;
+            gap: 3px;
+        }
+
+        .num-circle {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 8px;
+            color: #ffffff;
+        }
+
+        .accuracy-text {
+            font-size: 7px;
+            font-weight: 700;
+            color: #f87171;
+            margin-bottom: 2px;
+        }
+
+        .action-links {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 2px;
+        }
+
+        .action-btn {
+            font-size: 6.5px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 700;
+            color: white;
+        }
+
+        .tg-btn { background-color: #0284c7; }
+
+        .hide-btn {
+            background: none;
+            border: none;
+            color: #f87171;
+            font-size: 7px;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- তোর রেফারেল গেম লিংক এখানে iframe এ ওপেন হবে -->
+    <iframe id="game-iframe" src="https://hgnice.bet/#/register?invitationCode=68758106622" loading="lazy"></iframe>
+
+    <!-- ফ্লোটিং আইকন -->
+    <div id="floating-icon-btn" onclick="togglePopup()">
+        <img src="https://imagepaste.org/i/wcjrvxb4.png" alt="Siddik Icon">
+    </div>
+
+    <!-- হ্যাক পপআপ উইন্ডো -->
+    <div class="overlay-box" id="main-content">
+        <video class="card-bg-video" autoplay loop muted playsinline>
+            <source src="https://cdn.imageurlgenerator.com/uploads/59c06f5b-cd64-4347-b909-ba84a59b62f3.mp4" type="video/mp4">
+        </video>
+
+        <div class="card-content-inner">
+            <img src="https://imagepaste.org/i/wcjrvxb4.png" alt="Icon" class="market-icon-small">
+            <div class="owner-title">♚𝗢𝗪𝗡𝗘𝗥 𝗢𝗙 𝗦𝗜𝗗𝗗𝗜𝗞【𝟐𝐱™️】</div>
+            <div class="watermark-text">HIGNICE OFFICIAL HACK</div>
+
+            <div class="market-selector">
+                <button class="market-btn active" id="btn-30s" onclick="switchMarket(30, '30S')">30S</button>
+                <button class="market-btn" id="btn-1m" onclick="switchMarket(60, '1M')">1M</button>
+            </div>
+
+            <!-- পাসওয়ার্ড এক্সেস সেকশন -->
+            <div id="auth-section">
+                <input type="password" id="pass-input" class="auth-input" placeholder="VIP ACCESS">
+                <label class="remember-row">
+                    <input type="checkbox" id="remember-pass"> Remember Password
+                </label>
+                <button class="auth-btn" onclick="checkPassword()">Login</button>
+                <div id="error-msg">Wrong Password!</div>
+            </div>
+
+            <div id="hack-active-section">
+                <div id="period" class="period-number">Loading...</div>
+                <div id="timer" class="timer-display">Next: --s</div>
+
+                <div class="signal-row">
+                    <span id="res-size">CALC...</span>
+                    <div class="number-balls">
+                        <div class="num-circle" id="num-1">-</div>
+                        <div class="num-circle" id="num-2">-</div>
+                    </div>
+                </div>
+
+                <div class="accuracy-text" id="acc-text">ACCURACY: 98%</div>
+
+                <div class="action-links">
+                    <a href="https://t.me/BDT5847" target="_blank" class="action-btn tg-btn">Telegram</a>
+                </div>
+            </div>
+
+            <button class="hide-btn" onclick="hidePopup()">HIDE / CLOSE</button>
+        </div>
+    </div>
+
+    <script>
+        let isUnlocked = localStorage.getItem("siddik_hack_unlocked") === "true";
+        let currentDuration = 30; 
+        let marketCode = "30S";
+
+        window.onload = function() {
+            if (isUnlocked) {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('hack-active-section').style.display = 'flex';
+                startPeriodGenerator();
+            }
+        };
+
+        function togglePopup() {
+            const popup = document.getElementById('main-content');
+            const icon = document.getElementById('floating-icon-btn');
+            popup.style.display = 'flex';
+            icon.style.display = 'none';
+        }
+
+        function hidePopup() {
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('floating-icon-btn').style.display = 'flex';
+        }
+
+        function switchMarket(duration, code) {
+            currentDuration = duration;
+            marketCode = code;
+            
+            document.getElementById('btn-30s').classList.remove('active');
+            document.getElementById('btn-1m').classList.remove('active');
+            
+            if (code === '30S') {
+                document.getElementById('btn-30s').classList.add('active');
+            } else {
+                document.getElementById('btn-1m').classList.add('active');
+            }
+            if (isUnlocked) {
+                startPeriodGenerator();
+            }
+        }
+
+        function checkPassword() {
+            const pass = document.getElementById('pass-input').value;
+            const rememberMe = document.getElementById('remember-pass').checked;
+
+            if (pass === "SIDDIK58") {
+                isUnlocked = true;
+                if (rememberMe) {
+                    localStorage.setItem("siddik_hack_unlocked", "true");
+                }
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('hack-active-section').style.display = 'flex';
+                startPeriodGenerator();
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+                document.getElementById('pass-input').value = "";
+            }
+        }
+
+        function startPeriodGenerator() {
+            function update() {
+                if (!isUnlocked) return;
+                
+                const now = new Date();
+                const totalSecondsToday = now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds();
+                
+                let periodIndex = Math.floor(totalSecondsToday / currentDuration) + 1;
+                let dateStr = `${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, '0')}${String(now.getUTCDate()).padStart(2, '0')}`;
+                
+                let fullPeriodNumber = `${dateStr}${marketCode === '30S' ? '30' : '1000'}${String(10000 + periodIndex).slice(-4)}`;
+                let timeLeft = currentDuration - (totalSecondsToday % currentDuration);
+                
+                document.getElementById('period').innerText = fullPeriodNumber;
+                document.getElementById('timer').innerText = `Next: ${timeLeft < 10 ? '0' : ''}${timeLeft}s`;
+
+                let seed = parseInt(fullPeriodNumber);
+                let x = Math.sin(seed * 73.156) * 10000;
+                let randomFactor = Math.abs(x - Math.floor(x));
+                let isBig = (seed % 2 === 0);
+                if (randomFactor > 0.45) isBig = !isBig;
+
+                let predictedSize = isBig ? "BIG" : "SMALL";
+                let sizeEl = document.getElementById('res-size');
+                sizeEl.innerText = predictedSize;
+                sizeEl.style.color = predictedSize === "BIG" ? "#ff3333" : "#00ff88";
+
+                let confidenceScore = Math.floor(93 + (randomFactor * 6));
+                document.getElementById('acc-text').innerText = `ACCURACY: ${confidenceScore}%`;
+
+                const bigPool = [5, 6, 7, 8, 9];
+                const smallPool = [0, 1, 2, 3, 4];
+                let num1, num2;
+                if (isBig) {
+                    num1 = bigPool[Math.floor(Math.abs(Math.sin(seed * 12.3)) * bigPool.length)];
+                    num2 = bigPool[Math.floor(Math.abs(Math.cos(seed * 45.6)) * bigPool.length)];
+                } else {
+                    num1 = smallPool[Math.floor(Math.abs(Math.sin(seed * 12.3)) * smallPool.length)];
+                    num2 = smallPool[Math.floor(Math.abs(Math.cos(seed * 45.6)) * smallPool.length)];
+                }
+
+                updateNumStyle('num-1', num1);
+                updateNumStyle('num-2', num2);
+                
+                setTimeout(update, 1000);
+            }
+            update();
+        }
+
+        function updateNumStyle(elementId, num) {
+            let el = document.getElementById(elementId);
+            el.innerText = num;
+            
+            if (num === 0) {
+                el.style.background = "linear-gradient(135deg, #ff3333 50%, #9c27b0 50%)";
+            } else if (num === 5) {
+                el.style.background = "linear-gradient(135deg, #00ff88 50%, #9c27b0 50%)";
+            } else if (num % 2 === 0) {
+                el.style.background = "#ff3333";
+            } else {
+                el.style.background = "#00ff88";
+                el.style.color = "#000";
+            }
+        }
+
+        makeDraggable(document.getElementById("floating-icon-btn"));
+        makeDraggable(document.getElementById("main-content"));
+
+        function makeDraggable(elmnt) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            
+            elmnt.onmousedown = dragMouseDown;
+            elmnt.ontouchstart = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                let clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+                let clientY = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+                pos3 = clientX;
+                pos4 = clientY;
+                document.onmouseup = closeDragElement;
+                document.ontouchend = closeDragElement;
+                document.onmousemove = elementDrag;
+                document.ontouchmove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                let clientX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+                let clientY = e.type === "touchmove" ? e.touches[0].clientY : e.clientY;
+                pos1 = pos3 - clientX;
+                pos2 = pos4 - clientY;
+                pos3 = clientX;
+                pos4 = clientY;
+                
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                elmnt.style.transform = "none";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.ontouchend = null;
+                document.onmousemove = null;
+                document.ontouchmove = null;
+            }
+        }
+    </script>
+</body>
+</html>
